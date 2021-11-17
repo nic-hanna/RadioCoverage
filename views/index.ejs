@@ -5,28 +5,68 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>Coliban Group Radio Coverage Testing</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <!-- CSS -->
     <link rel='stylesheet' type='text/css' media='screen' href='/public/css/main.css'>
-    <script src='/public/js/main.js'></script>
+    <!-- Leaflet (Map)-->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
     integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
     crossorigin=""/>
-    <!-- Make sure you put this AFTER Leaflet's CSS -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
     integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
     crossorigin=""></script>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <!-- JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Data tables-->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+    
 </head>
 <body>
-    <div id="map" style="height: 500px;"></div>
-    <form onsubmit="return false">
-        <label>Location</label>
-        <input id="location"><br>
-        <label>Radio RSSI</label>
-        <input id="rssi"><br>
-        <button id="button">Show my location</button>
-    </form>
-    <br>
+    <div id="map" style="height: 70vh;"></div><br>
+    <div class="container">
+        <form onsubmit="return false">
+            <label class="form-label">Location</label>
+            <input id="location" class="form-control" required><br>
+            <label class="form-label">Radio RSSI</label>
+            <input id="rssi" class="form-control" type="number" required><br>
+            <button id="button" class="btn btn-primary mx-auto col-12">Mark Data</button>
+        </form><br><br>
+        <div class="scroll">
+            <table id="tests" class="display">
+                <thead>
+                    <tr>
+                        <th>TestID</th>
+                        <th>Location</th>
+                        <th>RSSI</th>
+                        <th>Latitude</th>
+                        <th>Longitude</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% tests.forEach(test => { %>
+                        <tr>
+                            <td><%= test.testID %></td>
+                            <td><%= test.location %></td>
+                            <td><%= test.rssi %></td>
+                            <td><%= test.lat %></td>
+                            <td><%= test.long %></td>
+                        </tr>
+                    <% }); %>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div><br><br>
 
     <script>
+        //Table init
+        $(document).ready( function () {
+            $('#tests').DataTable();
+        });
+
+        //Map init
         var mymap = L.map('map').setView([-37.2523, 144.4525], 12);
         L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -36,27 +76,88 @@
             zoomOffset: -1,
             accessToken: 'pk.eyJ1IjoidGVkZHk5MjY0IiwiYSI6ImNrdzFncjZpMzAyOWkyb3IwdXAzdjJnbmcifQ.02kZibqg5DH9wPN3P47j4A'
         }).addTo(mymap);
+
+        //Define marker colours
+        var redIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+        var orangeIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+        var greenIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+        var yellowIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+        var grayIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gray.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+        //Get Locations (markers)
         var locations = <%- JSON.stringify(tests) %>
-        console.log(locations);
+
+        //Creates marker for all locations and calcuate marker colour based off strength (higher number is better)
         for (var i = 0; i < locations.length; i++) {
-            marker = new L.marker([locations[i]["lat"], locations[i]["long"]])
+            if (locations[i]["rssi"] >= -83.5){
+                var icon = "redIcon";
+            } else if (locations[i]["rssi"] >= -89.5) {
+                var icon = "orangeIcon";
+            } else if (locations[i]["rssi"] >= -107.0) {
+                var icon = "greenIcon";
+            } else if (locations[i]["rssi"] >= -113) {
+                var icon = "yellowIcon";
+            } else {
+                var icon = "grayIcon";
+            }
+            //Create Marker
+            marker = new L.marker([locations[i]["lat"], locations[i]["long"]], {icon: eval(icon)})
                 .bindPopup(`<b>${locations[i]["location"]}</b><br>RSSI: ${locations[i]["rssi"]}`)
                 .addTo(mymap);
         }
         
-        function geoFindMe() {
-            
+        //Function to create location from form and refresh page
+        function addMarker() {
             function success(position) {
                 const lat  = position.coords.latitude;
                 const long = position.coords.longitude;
                 const location = document.getElementById("location").value;
                 const rssi = document.getElementById("rssi").value;
-                var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
-                xmlhttp.open("POST", "/newLocation");
-                xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-                xmlhttp.send(JSON.stringify({ "location": location, "rssi": rssi, "lat": lat, "long": long}));
-                console.log(1)
 
+                var http = new XMLHttpRequest();
+                http.open("POST", "/newLocation");
+                http.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                http.send(JSON.stringify({ "location": location, "rssi": rssi, "lat": lat, "long": long}));
+                http.onreadystatechange = function() {
+                    if(http.readyState == 4 && http.status == 200) {
+                        window.location.reload();
+                    }
+                }
             }
 
             function error() {
@@ -64,13 +165,12 @@
             }
 
             if(!navigator.geolocation) {
-                status.textContent = 'Geolocation is not supported by your browser';
+                window.alert('Geolocation is not supported by your browser, can not record test.');
             } else {
                 navigator.geolocation.getCurrentPosition(success, error);
             }
-
         }
-        document.getElementById('button').addEventListener('click', geoFindMe)
+        document.getElementById('button').addEventListener('click', addMarker)
     </script>
 </body>
 </html>
