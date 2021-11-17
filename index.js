@@ -36,7 +36,16 @@ app.get('/', (req, res) => {
     db.all(`SELECT testID, lat, long, location, rssi FROM tests`, [], (err, rows) => {
         res.render('index', {"tests":rows}) 
     });
-  
+})
+app.get('/removeTest/:testID', (req, res) => {
+    if (/^\d+$/.test(req.params.testID)){
+        db.run(`DELETE FROM tests WHERE testID = ?`, req.params.testID, (err) => {
+            if (err){
+                throw err;
+            }
+        })
+        res.redirect('/#tests')
+    }
 })
 
 app.post('/newLocation', (req, res) => {
@@ -51,5 +60,18 @@ app.post('/newLocation', (req, res) => {
         res.sendStatus(200)
     } else {
         res.sendStatus(400)
+    }
+})
+
+app.post('/editTest/:testID', (req, res) => {
+    console.log(req.body)
+    if (/^\d+$/.test(req.params.testID)){
+        db.run(`UPDATE FROM tests(location, rssi, lat, long) VALUES (?, ?, ?, ?) WHERE testID = ?`, [req.body.location, req.body.rssi, req.body.lat, req.body.long, req.params.testID], (err) => {
+            if (err){
+                throw err;
+
+            }
+        })
+        res.redirect('/#tests')
     }
 })

@@ -16,6 +16,8 @@
     crossorigin=""></script>
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css" rel="stylesheet">
     <!-- JQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <!-- Data tables-->
@@ -42,16 +44,20 @@
                         <th>RSSI</th>
                         <th>Latitude</th>
                         <th>Longitude</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody>
                     <% tests.forEach(test => { %>
                         <tr>
-                            <td><%= test.testID %></td>
-                            <td><%= test.location %></td>
-                            <td><%= test.rssi %></td>
-                            <td><%= test.lat %></td>
-                            <td><%= test.long %></td>
+                            <td id="<%= test.testID %>_ID"><%= test.testID %></td>
+                            <td id="<%= test.testID %>_location"><%= test.location %></td>
+                            <td id="<%= test.testID %>_rssi"><%= test.rssi %></td>
+                            <td id="<%= test.testID %>_lat"><%= test.lat %></td>
+                            <td id="<%= test.testID %>_long"><%= test.long %></td>
+                            <td class="text-center"><button class="btn btn-primary" onclick="openEdit('<%= test.testID %>')"><i class="bi bi-pencil-square"></i></button></td>
+                            <td class="text-center"><a href="/removeTest/<%= test.testID %>" class="btn btn-danger"><i class="bi bi-x-square"></i></button></i></td>
                         </tr>
                     <% }); %>
                     
@@ -59,7 +65,32 @@
             </table>
         </div>
     </div><br><br>
-
+    <div class="modal fade" id="editTest" tabindex="-1" aria-labelledby="editTestLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editTestLabel">Edit Test <span id="testID"></span></h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editTestForm" method="POST" action="/editTest/">
+                <div class="modal-body">
+                  <label class="form-label">Location</label><br>
+                  <input id="edit_location" class="form-control" name="location"><br>
+                  <label class="form-label">RSSI</label><br>
+                  <input id="edit_rssi" class="form-control" name="rssi"><br>
+                  <label class="form-label">Latitude</label><br>
+                  <input id="edit_lat" class="form-control" name="lat"><br>
+                  <label class="form-label">Longitude</label><br>
+                  <input id="edit_long" class="form-control" name="long"><br>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-primary">
+                </div>
+            </form>
+          </div>
+        </div>
+    </div>
     <script>
         //Table init
         $(document).ready( function () {
@@ -136,7 +167,7 @@
                 var icon = "grayIcon";
             }
             //Create Marker
-            marker = new L.marker([locations[i]["lat"], locations[i]["long"]], {icon: eval(icon)})
+            marker = new L.marker([locations[i]["lat"], locations[i]["long"]], {icon: window[icon]})
                 .bindPopup(`<b>${locations[i]["location"]}</b><br>RSSI: ${locations[i]["rssi"]}`)
                 .addTo(mymap);
         }
@@ -171,6 +202,18 @@
             }
         }
         document.getElementById('button').addEventListener('click', addMarker)
+
+        function openEdit(testID){
+            var fields = ["location", "rssi", "lat", "long"]
+            fields.forEach(x => {
+                console.log('edit_'+x)
+                console.log(testID+'_'+x)
+                document.getElementById('edit_'+x).value = document.getElementById(testID+'_'+x).innerHTML;
+            })
+            document.getElementById("editTestForm").action =  document.getElementById("editTestForm").action + testID
+            var editModal = new bootstrap.Modal(document.getElementById('editTest')).toggle()
+            
+        }
     </script>
 </body>
 </html>
