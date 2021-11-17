@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Coliban Group Radio Coverage Testing</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='/public/css/main.css'>
+    <script src='/public/js/main.js'></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin=""/>
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+</head>
+<body>
+    <div id="map" style="height: 500px;"></div>
+    <form onsubmit="return false">
+        <label>Location</label>
+        <input id="location"><br>
+        <label>Radio RSSI</label>
+        <input id="rssi"><br>
+        <button id="button">Show my location</button>
+    </form>
+    <br>
+
+    <script>
+        var mymap = L.map('map').setView([-37.2523, 144.4525], 12);
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 18,
+            id: 'mapbox/streets-v11',
+            tileSize: 512,
+            zoomOffset: -1,
+            accessToken: 'pk.eyJ1IjoidGVkZHk5MjY0IiwiYSI6ImNrdzFncjZpMzAyOWkyb3IwdXAzdjJnbmcifQ.02kZibqg5DH9wPN3P47j4A'
+        }).addTo(mymap);
+        var locations = <%- JSON.stringify(tests) %>
+        console.log(locations);
+        for (var i = 0; i < locations.length; i++) {
+            marker = new L.marker([locations[i]["lat"], locations[i]["long"]])
+                .bindPopup(`<b>${locations[i]["location"]}</b><br>RSSI: ${locations[i]["rssi"]}`)
+                .addTo(mymap);
+        }
+        
+        function geoFindMe() {
+            
+            function success(position) {
+                const lat  = position.coords.latitude;
+                const long = position.coords.longitude;
+                const location = document.getElementById("location").value;
+                const rssi = document.getElementById("rssi").value;
+                var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+                xmlhttp.open("POST", "/newLocation");
+                xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                xmlhttp.send(JSON.stringify({ "location": location, "rssi": rssi, "lat": lat, "long": long}));
+                console.log(1)
+
+            }
+
+            function error() {
+                console.error("Location not supported")
+            }
+
+            if(!navigator.geolocation) {
+                status.textContent = 'Geolocation is not supported by your browser';
+            } else {
+                navigator.geolocation.getCurrentPosition(success, error);
+            }
+
+        }
+        document.getElementById('button').addEventListener('click', geoFindMe)
+    </script>
+</body>
+</html>
