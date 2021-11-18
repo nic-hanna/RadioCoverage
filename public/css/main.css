@@ -5,5 +5,10 @@ html, body {
 }
 
 .scroll {
-    overflow-x: auto;
+    overflow-x: scroll;
 }
+
+.box {
+    display: flex;
+    align-items:center;
+ }

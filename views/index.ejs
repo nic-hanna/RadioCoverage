@@ -26,15 +26,21 @@
     
 </head>
 <body>
-    <div id="map" style="height: 70vh;"></div><br>
     <div class="container">
-        <form onsubmit="return false">
-            <label class="form-label">Location</label>
-            <input id="location" class="form-control" required><br>
-            <label class="form-label">Radio RSSI</label>
-            <input id="rssi" class="form-control" type="number" required><br>
-            <button id="button" class="btn btn-primary mx-auto col-12">Mark Data</button>
-        </form><br><br>
+        <div class="row box">
+            <div class="col-12 col-md-9">
+                <div id="map" style="height: 70vh;"></div><br>
+            </div>
+            <div class="col-12 col-md-3">
+                <form onsubmit="return false">
+                    <label class="form-label">Location</label>
+                    <input id="location" class="form-control" required><br>
+                    <label class="form-label">Radio RSSI</label>
+                    <input id="rssi" class="form-control" type="number" required><br>
+                    <button id="button" class="btn btn-primary mx-auto col-12">Mark Data</button>
+                </form><br><br>
+            </div>
+        </div>
         <div class="scroll">
             <table id="tests" class="display">
                 <thead>
@@ -98,7 +104,7 @@
         });
 
         //Map init
-        var mymap = L.map('map').setView([-37.2523, 144.4525], 12);
+        var mymap = L.map('map').setView([-37.2523, 144.4525], 11);
         L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
             maxZoom: 18,
