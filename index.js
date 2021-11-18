@@ -2,7 +2,6 @@ const express = require('express')
 const http = require('http');
 const https = require('https');
 const fs = require('fs');
-const e = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const app = express()
 const port = 3000
